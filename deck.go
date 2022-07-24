@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // Create a new type of 'deck'
 // which is a slice of strings
@@ -45,4 +48,11 @@ func deal(d deck, handSize int) (deck, deck) {
 	// set to return TWO values, both of type deck
 	// splitting the deck into two, one of handsize, one of everything else
 	return d[:handSize], d[handSize:]
+}
+
+// Turning type deck into String, add receiver so we can eventually call cards.toString()
+func (d deck) toString() string {
+	// type conversion, we want a slice of strings and we have d
+	return strings.Join([]string(d), ",")
+	// returns our string slice as a single string seperated by commas 
 }
