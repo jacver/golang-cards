@@ -2,7 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
+	"math/rand"
+	"os"
 	"strings"
+	"time"
 )
 
 // Create a new type of 'deck'
@@ -55,4 +59,41 @@ func (d deck) toString() string {
 	// type conversion, we want a slice of strings and we have d
 	return strings.Join([]string(d), ",")
 	// returns our string slice as a single string seperated by commas 
+}
+
+func (d deck) saveToFile(filename string) error {
+	return ioutil.WriteFile(filename, []byte(d.toString()), 0666)
+}
+
+func newDeckFromFile(filename string) deck {
+	bs, err := ioutil.ReadFile(filename)
+	if err != nil {
+		// When handling a Go error, consider what you want to happen when something breaks
+		// Option 1: Log the error and return a call to newDeck() so user can still have a deck
+		// Option 2: Log error and quit program
+		fmt.Println("Error: ", err)
+		// Any int except 0 will trigger an exit -- 1 is fine here
+		os.Exit(1)
+	} 
+	
+	// turn byte slice into slice of strings
+	s := strings.Split(string(bs), ",") 
+	// Type conversion to get a deck from our slice of strings
+	return deck(s)
+}
+
+// ideally we could cards.shuffle() -- so we need receiver
+func (d deck) shuffle() {
+	// generating a truly random number
+	source := rand.NewSource(time.Now().UnixNano()) // each time we run the program, it will generate a seed bc time will always be different
+	r := rand.New(source)
+	// r is type Rand so now it can call Intn below
+
+	for i := range d {
+		// no need for card, just use index
+		newPosition := r.Intn(len(d) - 1) 
+
+
+		d[i], d[newPosition] = d[newPosition], d[i] // swaps both elements
+	}
 }
